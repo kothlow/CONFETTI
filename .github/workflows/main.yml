@@ -7,6 +7,14 @@ on:
       - release
 
 jobs:
+  install:
+      runs-on: ubuntu-latest
+  
+      steps:
+          - uses: actions/checkout@v3
+          
+          - name: Setup pnpm
+            uses: pnpm/action-setup@v3
   publish-tauri:
     permissions:
       contents: write
