@@ -1,15 +1,15 @@
 name: 'publish'
 
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - release
+    push:
+        tags:
+            - v*
 
 jobs:
   publish-tauri:
     permissions:
       contents: write
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -29,11 +29,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'pnpm'
+      - uses: pnpm/action-setup@v4
+              with:
+                  version: 9
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  registry-url: https://registry.npmjs.org
+                  cache: pnpm
+            - name: Install Dependencies
+              run: pnpm i --frozen-lockfile
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
