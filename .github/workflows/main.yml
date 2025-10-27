@@ -7,14 +7,6 @@ on:
       - release
 
 jobs:
-  install:
-      runs-on: ubuntu-latest
-  
-      steps:
-          - uses: actions/checkout@v3
-          
-          - name: Setup pnpm
-            uses: pnpm/action-setup@v3
   publish-tauri:
     permissions:
       contents: write
@@ -36,6 +28,12 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
@@ -62,7 +60,10 @@ jobs:
 
       - name: install frontend dependencies
         # If you don't have `beforeBuildCommand` configured you may want to build your frontend here too.
-        run: yarn install # change this to npm or pnpm depending on which one you use.
+        run: pnpm install --frozen-lockfile
+
+      - name: build frontend
+        run: pnpm run build
 
       - uses: tauri-apps/tauri-action@v0
         env:
